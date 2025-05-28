@@ -10,7 +10,6 @@ import jade.core.behaviours.OneShotBehaviour;
 
 import aima.core.environment.wumpusworld.AgentPercept;
 import aima.core.environment.wumpusworld.HybridWumpusAgent;
-// *** тут правильний імпорт інтерфейсу Action ***
 import aima.core.agent.Action;
 
 public class NavigatorAgent extends Agent {
@@ -34,7 +33,7 @@ public class NavigatorAgent extends Agent {
         // 2) Ініціалізація одного екземпляра AIMA-агента
         aimaAgent = new HybridWumpusAgent();
 
-        // 3) Поведінка: слухаємо повідомлення від SpelunkerAgent
+        // 3) Поведінка: слухаємо SpelunkerAgent
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
@@ -60,17 +59,26 @@ public class NavigatorAgent extends Agent {
                             );
                             System.out.println("[Navigator] Parsed percept → " + percept);
 
-                            // 6) Викликаємо AIMA-агента
+                            // 6) Виклик AIMA-агента
                             Action act = aimaAgent.execute(percept);
-
-                            // 7) Беремо чисту назву дії через toString()
-                            String actionName = act.toString();
-                            if(actionName.contains("[")){
-                                actionName = actionName.substring(actionName.indexOf("==")+2, actionName.indexOf(","));
+                            String full = act.toString();
+                            // ----- чистимо назву дії з рядка -----
+                            String actionName;
+                            int idx = full.indexOf("name==");
+                            if (idx >= 0) {
+                                int start = idx + 6;
+                                int comma = full.indexOf(',', start);
+                                if (comma > start) {
+                                    actionName = full.substring(start, comma);
+                                } else {
+                                    actionName = full.substring(start, full.indexOf(']'));
+                                }
+                            } else {
+                                actionName = full; // якщо формат несподіваний
                             }
                             System.out.println("[Navigator] Suggesting: " + actionName);
 
-                            // 8) Відправляємо назад SpelunkerAgent
+                            // 7) Відправляємо назад SpelunkerAgent
                             ACLMessage reply = msg.createReply();
                             reply.setPerformative(ACLMessage.INFORM);
                             reply.setContent(actionName);
