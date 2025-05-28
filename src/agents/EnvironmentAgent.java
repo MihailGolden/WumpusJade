@@ -28,7 +28,6 @@ public class EnvironmentAgent extends Agent {
         pits   = new boolean[size][size];
         wumpus = new boolean[size][size];
         gold   = new boolean[size][size];
-        // Приклад розстановки — ви можете змінити/доповнити
         pits[1][3]    = true;
         pits[2][1]    = true;
         wumpus[2][2]  = true;
@@ -58,24 +57,26 @@ public class EnvironmentAgent extends Agent {
             public void action() {
                 ACLMessage msg = receive();
                 if (msg != null) {
+                    System.out.println("[Environment] Message received: " + msg.getContent());
                     switch (msg.getPerformative()) {
                         case ACLMessage.REQUEST:
-                            // відповідаємо перцептами
+                            System.out.println("[Environment] Processing REQUEST");
                             addBehaviour(new OneShotBehaviour() {
                                 @Override
                                 public void action() {
-                                    String p = buildPercepts();           // "[Stench, Breeze, ...]"
+                                    String p = buildPercepts();
                                     ACLMessage reply = msg.createReply();
                                     reply.setPerformative(ACLMessage.INFORM);
                                     reply.setContent("Percepts" + p + "," + timeTick);
+                                    System.out.println("[Environment] Sending percepts: " + reply.getContent());
                                     timeTick++;
                                     send(reply);
                                 }
                             });
                             break;
                         case ACLMessage.CFP:
-                            // застосовуємо дію і повертаємо ACCEPT
-                            String content = msg.getContent();  // "Action(Forward)"
+                            System.out.println("[Environment] Processing CFP");
+                            String content = msg.getContent();
                             addBehaviour(new OneShotBehaviour() {
                                 @Override
                                 public void action() {
@@ -84,11 +85,13 @@ public class EnvironmentAgent extends Agent {
                                     ACLMessage reply = msg.createReply();
                                     reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                                     reply.setContent("OK");
+                                    System.out.println("[Environment] Action applied: " + act);
                                     send(reply);
                                 }
                             });
                             break;
                         default:
+                            System.out.println("[Environment] Unknown performative: " + msg.getPerformative());
                             break;
                     }
                 } else {
