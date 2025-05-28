@@ -24,6 +24,17 @@ public class EnvironmentAgent extends Agent {
 
     @Override
     protected void setup() {
+        // 0) Зчитаємо параметр worldId з аргументів
+        Object[] args = getArguments();
+        int worldId = 1;
+        if (args != null && args.length > 0) {
+            try { worldId = Integer.parseInt((String) args[0]); }
+            catch(Exception e) { /* залишаємо 1 */ }
+        }
+        System.out.println("[Environment] Initializing world #" + worldId);
+        initWorld(worldId);
+
+
         // 1) Ініціалізація поля
         pits   = new boolean[size][size];
         wumpus = new boolean[size][size];
@@ -199,4 +210,40 @@ public class EnvironmentAgent extends Agent {
         }
     }
 
+    private void initWorld(int id) {
+        // Очистити всі масиви
+        pits = new boolean[size][size];
+        wumpus = new boolean[size][size];
+        gold = new boolean[size][size];
+
+        switch (id) {
+            case 1:
+                // **World 1** — той, що зараз у вас:
+                pits[1][3] = true;
+                pits[2][1] = true;
+                wumpus[2][2] = true;
+                gold[0][2] = true;
+                break;
+            case 2:
+                // **World 2** — інша розстановка:
+                pits[0][2] = true;
+                pits[3][1] = true;
+                wumpus[1][1] = true;
+                gold[3][3] = true;
+                break;
+            case 3:
+                // **World 3** — ще інша:
+                pits[2][0] = true;
+                pits[2][3] = true;
+                wumpus[0][3] = true;
+                gold[2][2] = true;
+                break;
+            default:
+                // можна додати world 4, 5…
+                initWorld(1);
+        }
+        agentX   = 0; agentY = 0; agentDir = "EAST";
+        timeTick = 0;
+        bumpFlag   = false; screamFlag = false;
+    }
 }
