@@ -19,6 +19,8 @@ public class EnvironmentAgent extends Agent {
     private int agentX, agentY;
     private String agentDir;
     private int timeTick;
+    private boolean bumpFlag = false;
+    private boolean screamFlag = false;
 
     @Override
     protected void setup() {
@@ -96,15 +98,21 @@ public class EnvironmentAgent extends Agent {
         });
     }
 
-    // Збираємо список перцептів у поточній клітинці
     private String buildPercepts() {
         List<String> p = new ArrayList<>();
         if (wumpus[agentX][agentY]) p.add("Stench");
         if (pits[agentX][agentY])   p.add("Breeze");
         if (gold[agentX][agentY])   p.add("Glitter");
-        // TODO: додати Bump/Scream за потреби
+        if (bumpFlag)               p.add("Bump");
+        if (screamFlag)             p.add("Scream");
+
+        // Після формування перцептів — скидати прапорці
+        bumpFlag = false;
+        screamFlag = false;
+
         return p.toString();
     }
+
 
     // Розбираємо "Action(Forward)" → "Forward"
     private String parseAction(String content) {
@@ -136,10 +144,14 @@ public class EnvironmentAgent extends Agent {
             case "SOUTH": ny--; break;
         }
         if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
-            agentX = nx; agentY = ny;
+            agentX = nx;
+            agentY = ny;
+        } else {
+            // зіткнення зі стіною
+            bumpFlag = true;
         }
-        // інакше — Bump, але тут не обробляємо
     }
+
 
     private void turnLeft() {
         agentDir = switch (agentDir) {
@@ -176,7 +188,12 @@ public class EnvironmentAgent extends Agent {
             case "SOUTH": ty--; break;
         }
         if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-            wumpus[tx][ty] = false;
+            if (wumpus[tx][ty]) {
+                // влучили у Wumpusa
+                wumpus[tx][ty] = false;
+                screamFlag = true;
+            }
         }
     }
+
 }
