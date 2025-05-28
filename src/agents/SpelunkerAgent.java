@@ -47,12 +47,18 @@ public class SpelunkerAgent extends Agent {
         synonyms.put("Glitter", Arrays.asList(
                 "I see a glitter.", "There's a sparkling object.", "Something is glinting."
         ));
+
         synonyms.put("Bump", Arrays.asList(
-                "I bumped into something.", "There was a bump.", "I hit a wall."
+                "I bumped into something.",
+                "There was a bump.",
+                "I hit a wall."
         ));
         synonyms.put("Scream", Arrays.asList(
-                "I heard a scream.", "There was a scream.", "I heard it faintly."
+                "I heard a scream.",
+                "There was a scream.",
+                "I heard it faintly."
         ));
+
 
         // 4) Основна поведінка
         addBehaviour(new Behaviour() {
